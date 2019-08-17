@@ -1009,7 +1009,9 @@ public class PermissionManager {
         if (hasElement(commandList)) {
             isExecuteSuccess = execCommand(commandList);
             Log.e(TAG, "command execute result: " + isExecuteSuccess);
-            for (Task task : mTaskList) {
+        }
+        if(hasElement(mTaskList)){
+            for (final Task task : mTaskList) {
                 if (needRequestPermission()) {
                     if (hasElement(task.allowPermissionList)) {
                         task.allowPermissionSuccessful = isAllowedPermissionAll(mContext, task.packageName, task.allowPermissionList);
@@ -1036,23 +1038,24 @@ public class PermissionManager {
                     task.deviceOwnerSuccessful = isDeviceOwner(mContext, task.packageName);
                 }
             }
-            if (hasElement(mSets.getSecureSets())) {
-                for (Map.Entry<String, String> entry : mSets.getSecureSets().entrySet()) {
-                    String value = Settings.Secure.getString(mContext.getContentResolver(), entry.getKey());
-                    boolean success = equalsSettingsValue(value, entry.getValue());
-                    mSets.getSecureSetResult().put(entry.getKey(), success);
-                    if (!success) mSets.isSuccessful = false;
-                }
-            }
-            if (hasElement(mSets.getGlobalSets())) {
-                for (Map.Entry<String, String> entry : mSets.getGlobalSets().entrySet()) {
-                    String value = Settings.Global.getString(mContext.getContentResolver(), entry.getKey());
-                    boolean success = equalsSettingsValue(value, entry.getValue());
-                    mSets.getGlobalSetResult().put(entry.getKey(), success);
-                    if (!success) mSets.isSuccessful = false;
-                }
+        }
+        if (hasElement(mSets.getSecureSets())) {
+            for (Map.Entry<String, String> entry : mSets.getSecureSets().entrySet()) {
+                String value = Settings.Secure.getString(mContext.getContentResolver(), entry.getKey());
+                boolean success = equalsSettingsValue(value, entry.getValue());
+                mSets.getSecureSetResult().put(entry.getKey(), success);
+                if (!success) mSets.isSuccessful = false;
             }
         }
+        if (hasElement(mSets.getGlobalSets())) {
+            for (Map.Entry<String, String> entry : mSets.getGlobalSets().entrySet()) {
+                String value = Settings.Global.getString(mContext.getContentResolver(), entry.getKey());
+                boolean success = equalsSettingsValue(value, entry.getValue());
+                mSets.getGlobalSetResult().put(entry.getKey(), success);
+                if (!success) mSets.isSuccessful = false;
+            }
+        }
+
         //处理结果
         Result result = new Result(isExecuteSuccess, mTaskList, mSets);
         if (result.isExecuteSuccess()) {
@@ -1402,7 +1405,6 @@ public class PermissionManager {
         private List<Task> tasks = null;
         private Sets sets = null;
         private boolean isAllSuccessful;
-
 
         public Result(boolean executeSuccess, List<Task> tasks, Sets sets) {
             this.executeSuccess = executeSuccess;
