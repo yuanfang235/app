@@ -12,7 +12,7 @@
 判断某个应用的某项权限是否已获取
 可得知权限申请是否成功
 
-/**
+    /** 
      * 主线程异步请求权限
      */
     private void requestPermissions() {
