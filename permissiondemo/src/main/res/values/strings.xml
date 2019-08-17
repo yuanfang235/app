@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">PermissionDemo</string>
+
+    <string name="accessibility_service_description">请开启无障碍</string>
+
+    <string name="sample_device_admin">PermissinDemo</string>
+    <string name="sample_device_admin_description">请开启设备管理器</string>
+</resources>
