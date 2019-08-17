@@ -378,6 +378,7 @@ public class PermissionManager {
                     className = pkgName + className;
                 }
                 String myServiceName = pkgName + "/" + className;
+
                 boolean hasService = service != null && service.contains(myServiceName);
                 return hasService;
             }
@@ -938,12 +939,12 @@ public class PermissionManager {
                             if (enabled == 0) {
                                 commandList.add("settings put secure " + Settings.Secure.ACCESSIBILITY_ENABLED + " 1");
                             }
-                            if (srcServiceName == null) {
+                            if (srcServiceName == null || srcServiceName.trim().isEmpty()) {
                                 srcServiceName = myServiceName;
                             } else {
                                 srcServiceName = srcServiceName + ":" + myServiceName;
                             }
-                            commandList.add("settings put secure " + Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES + " " + srcServiceName);
+                            commandList.add("settings put secure " + Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES + " " + makeSettingsValue(srcServiceName));
                         }
                     } else {
                         if (hasService) {
@@ -956,7 +957,10 @@ public class PermissionManager {
                                     srcServiceName = srcServiceName.replace(myServiceName + ":", "");
                                 }
                             }
-                            commandList.add("settings put secure " + Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES + " " + srcServiceName);
+                            if (srcServiceName.isEmpty()) {
+                                srcServiceName = "\"\"";
+                            }
+                            commandList.add("settings put secure " + Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES + " " + makeSettingsValue(srcServiceName));
                         }
                     }
                 }
@@ -996,13 +1000,13 @@ public class PermissionManager {
         //安全设置
         if (hasElement(mSets.getSecureSets())) {
             for (Map.Entry<String, String> entry : mSets.getSecureSets().entrySet()) {
-                commandList.add("settings put secure " + entry.getKey() + " " + entry.getValue());
+                commandList.add("settings put secure " + entry.getKey() + " " + makeSettingsValue(entry.getValue()));
             }
         }
         //全局设置
         if (hasElement(mSets.getGlobalSets())) {
             for (Map.Entry<String, String> entry : mSets.getGlobalSets().entrySet()) {
-                commandList.add("settings put global " + entry.getKey() + " " + entry.getValue());
+                commandList.add("settings put global " + entry.getKey() + " " + makeSettingsValue(entry.getValue()));
             }
         }
         //执行结果
@@ -1010,7 +1014,7 @@ public class PermissionManager {
             isExecuteSuccess = execCommand(commandList);
             Log.e(TAG, "command execute result: " + isExecuteSuccess);
         }
-        if(hasElement(mTaskList)){
+        if (hasElement(mTaskList)) {
             for (final Task task : mTaskList) {
                 if (needRequestPermission()) {
                     if (hasElement(task.allowPermissionList)) {
@@ -1074,6 +1078,10 @@ public class PermissionManager {
             result.isAllSuccessful = isSuccessful;
         }
         return result;
+    }
+
+    private String makeSettingsValue(String value) {
+        return value != null && !value.trim().isEmpty() ? value : "\"\"";
     }
 
     /**
