@@ -1000,13 +1000,22 @@ public class PermissionManager {
         //安全设置
         if (hasElement(mSets.getSecureSets())) {
             for (Map.Entry<String, String> entry : mSets.getSecureSets().entrySet()) {
-                commandList.add("settings put secure " + entry.getKey() + " " + makeSettingsValue(entry.getValue()));
+                String value = Settings.Secure.getString(mContext.getContentResolver(), entry.getKey());
+                if(!equalsSettingsValue(value, entry.getValue())){
+                    commandList.add("settings put secure " + entry.getKey() + " " + makeSettingsValue(entry.getValue()));
+                }
             }
         }
         //全局设置
         if (hasElement(mSets.getGlobalSets())) {
             for (Map.Entry<String, String> entry : mSets.getGlobalSets().entrySet()) {
-                commandList.add("settings put global " + entry.getKey() + " " + makeSettingsValue(entry.getValue()));
+                String value = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    value = Settings.Global.getString(mContext.getContentResolver(), entry.getKey());
+                }
+                if(!equalsSettingsValue(value, entry.getValue())){
+                    commandList.add("settings put global " + entry.getKey() + " " + makeSettingsValue(entry.getValue()));
+                }
             }
         }
         //执行结果
